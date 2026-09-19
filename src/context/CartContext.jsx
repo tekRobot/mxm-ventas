@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { useLocation } from 'react-router-dom';
+import { API_BASE_URL } from '../config/api';
 
 const CartContext = createContext();
 
@@ -22,7 +23,7 @@ export const CartProvider = ({ children }) => {
       
       if (pedidoId) {
         // Si estamos en un pedido específico, obtener sus datos
-        const response = await fetch(`https://systemweb.ddns.net/CarritoWeb/APICarrito/Pedido/${pedidoId}?t=${Date.now()}`);
+        const response = await fetch(`${API_BASE_URL}/Pedido/${pedidoId}?t=${Date.now()}`);
         
         if (response.ok) {
           const data = await response.json();

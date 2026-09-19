@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../config/api";
 
 export const usePedidoDetail = () => {
   const { id } = useParams();
@@ -70,7 +71,7 @@ export const usePedidoDetail = () => {
         usuarioNombre: usuarioNombre
       };
 
-      const response = await fetch('https://systemweb.ddns.net/CarritoWeb/APICarrito/IniArmadoPedido', {
+      const response = await fetch(`${API_BASE_URL}/IniArmadoPedido`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +105,7 @@ export const usePedidoDetail = () => {
         setLoading(true);
         
         // Obtener lista de pedidos
-        const pedidosResponse = await fetch(`https://systemweb.ddns.net/CarritoWeb/APICarrito/ConsultaPedidosConfirmados?t=${Date.now()}`);
+        const pedidosResponse = await fetch(`${API_BASE_URL}/ConsultaPedidosConfirmados?t=${Date.now()}`);
         if (!pedidosResponse.ok) throw new Error('Error al obtener los pedidos');
         
         const pedidosData = await pedidosResponse.json();
@@ -114,7 +115,7 @@ export const usePedidoDetail = () => {
         setPedido(pedidoEncontrado);
         
         // Obtener detalle del pedido con ubicación, imagen y stock
-        const detalleResponse = await fetch(`https://systemweb.ddns.net/CarritoWeb/APICarrito/PedidoConfirmado/${id}?t=${Date.now()}`);
+        const detalleResponse = await fetch(`${API_BASE_URL}/PedidoConfirmado/${id}?t=${Date.now()}`);
         if (!detalleResponse.ok) throw new Error('Error al obtener el detalle del pedido');
         
         const detalleData = await detalleResponse.json();
@@ -284,7 +285,7 @@ export const usePedidoDetail = () => {
       };
 
       // Llamar a la API para guardar los cambios
-      const response = await fetch('https://systemweb.ddns.net/CarritoWeb/APICarrito/FinArmadoPedido', {
+      const response = await fetch(`${API_BASE_URL}/FinArmadoPedido`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

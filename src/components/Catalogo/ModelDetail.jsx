@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ImageModal from '../Armador/ImageModal.jsx';
+import { API_BASE_URL, IMAGE_BASE_URL } from '../../config/api';
 
 const ModelDetail = () => {
   const { modelId } = useParams();
@@ -17,7 +18,7 @@ const ModelDetail = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `https://systemweb.ddns.net/CarritoWeb/APICarrito/ConsultaVariacionModelo?Modelo=${modelId}`
+          `${API_BASE_URL}/ConsultaVariacionModelo?Modelo=${modelId}`
         );
         
         if (!response.ok) {
@@ -74,7 +75,7 @@ const ModelDetail = () => {
     if (!imagePath) return 'https://placehold.co/800x800/gray/white?text=Imagen+No+Disponible';
     
     const cleanPath = imagePath.replace(/\\/g, '/');
-    return `https://systemweb.ddns.net/CarritoWeb/${cleanPath}`;
+    return `${IMAGE_BASE_URL}/${cleanPath}`;
   };
 
   const getTotalStock = (tallas) => {

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { FaArrowsAltV, FaArrowUp, FaArrowDown } from "react-icons/fa";
+import { API_BASE_URL } from "../config/api";
 
 const Home = () => {
     const { user } = useAuth();
@@ -27,7 +28,7 @@ const Home = () => {
         
         try {
             const userId = user.username;
-            const response = await fetch(`https://systemweb.ddns.net/CarritoWeb/APICarrito/ConsultaPedidos?Usuario=${userId}&t=${Date.now()}`);
+            const response = await fetch(`${API_BASE_URL}/ConsultaPedidos?Usuario=${userId}&t=${Date.now()}`);
             
             if (!response.ok) {
                 throw new Error('Error al obtener los pedidos');
@@ -58,7 +59,7 @@ const Home = () => {
             const batchResults = await Promise.all(
                 batch.map(async (item) => {
                     try {
-                        const detalleResponse = await fetch(`https://systemweb.ddns.net/CarritoWeb/APICarrito/Pedido/${item.VENTA}?t=${Date.now()}`);
+                        const detalleResponse = await fetch(`${API_BASE_URL}/Pedido/${item.VENTA}?t=${Date.now()}`);
                         if (detalleResponse.ok) {
                             const detalleData = await detalleResponse.json();
                             return {

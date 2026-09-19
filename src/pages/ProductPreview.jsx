@@ -8,6 +8,7 @@ import ProductImage from '../components/Product/ProductImage';
 import ProductInfo from '../components/Product/ProductInfo';
 import ProductActions from '../components/Product/ProductActions';
 import LoadingOverlay from '../components/LoadingOverlay';
+import { API_BASE_URL } from '../config/api';
 
 const ProductPreview = () => {
   const { modelCode } = useParams();
@@ -55,10 +56,7 @@ const ProductPreview = () => {
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const response = await fetch('https://systemweb.ddns.net/CarritoWeb/APICarrito/ListModelos', {
-          headers: { 
-            'Origin': import.meta.env.VITE_API_ORIGIN,
-          },
+        const response = await fetch(`${API_BASE_URL}/ListModelos`, {
           cache: 'no-store'
         });
         if (!response.ok) throw new Error("Error al obtener los productos");
@@ -74,10 +72,7 @@ const ProductPreview = () => {
         setIs99PAQProduct(is99PAQ);
         
         const variationsResponse = await fetch(
-          `https://systemweb.ddns.net/CarritoWeb/APICarrito/ConsultaVariacionModelo?Modelo=${modelCode}&t=${Date.now()}`,
-          {
-            headers: { 'Origin': import.meta.env.VITE_API_ORIGIN },
-          }
+          `${API_BASE_URL}/ConsultaVariacionModelo?Modelo=${modelCode}&t=${Date.now()}`
         );
 
         if (!variationsResponse.ok) throw new Error("Error al obtener las variaciones");
@@ -324,11 +319,10 @@ const ProductPreview = () => {
         const availableStock = getAvailableStock();
         const desdeInventario = availableStock > 0;
 
-        const response = await fetch('https://systemweb.ddns.net/CarritoWeb/APICarrito/agregaArtPed', {
+        const response = await fetch(`${API_BASE_URL}/agregaArtPed`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Origin': import.meta.env.VITE_API_ORIGIN
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             Usuario: user.username,
@@ -404,11 +398,10 @@ const ProductPreview = () => {
         const ventaId = pedidoId || 'NUEVO';
         const desdeInventario = false;
         
-        const response = await fetch('https://systemweb.ddns.net/CarritoWeb/APICarrito/agregaArtPed', {
+        const response = await fetch(`${API_BASE_URL}/agregaArtPed`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Origin': import.meta.env.VITE_API_ORIGIN
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             Usuario: user.username,
@@ -470,11 +463,10 @@ const ProductPreview = () => {
             const packagePrice = parseFloat(size.precio3) || getIndividualPrice();
             const desdeInventario = false;
 
-            const response = await fetch('https://systemweb.ddns.net/CarritoWeb/APICarrito/agregaArtPed', {
+            const response = await fetch(`${API_BASE_URL}/agregaArtPed`, {
               method: 'POST',
               headers: {
-                'Content-Type': 'application/json',
-                'Origin': import.meta.env.VITE_API_ORIGIN
+                'Content-Type': 'application/json'
               },
               body: JSON.stringify({
                 Usuario: user.username,
@@ -487,7 +479,7 @@ const ProductPreview = () => {
             });
 
             const result = await response.json();
-            
+
             // VERIFICAR EL MENSAJE DE RESPUESTA - incluso con status 200
             if (hasStockError(result)) {
               hasError = true;
@@ -553,11 +545,10 @@ const ProductPreview = () => {
             const packagePrice = parseFloat(size.precio3) || getIndividualPrice();
             const desdeInventario = parseInt(size.Exis) > 0;
 
-            const response = await fetch('https://systemweb.ddns.net/CarritoWeb/APICarrito/agregaArtPed', {
+            const response = await fetch(`${API_BASE_URL}/agregaArtPed`, {
               method: 'POST',
               headers: {
-                'Content-Type': 'application/json',
-                'Origin': import.meta.env.VITE_API_ORIGIN
+                'Content-Type': 'application/json'
               },
               body: JSON.stringify({
                 Usuario: user.username,
@@ -570,7 +561,7 @@ const ProductPreview = () => {
             });
 
             const result = await response.json();
-            
+
             // VERIFICAR EL MENSAJE DE RESPUESTA - incluso con status 200
             if (hasStockError(result)) {
               hasError = true;

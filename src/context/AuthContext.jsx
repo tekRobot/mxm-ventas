@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config/api';
 
 const AuthContext = createContext();
 const INACTIVITY_TIMEOUT = 20 * 60 * 1000; // 20 minutos
@@ -70,7 +71,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await fetch('https://systemweb.ddns.net/CarritoWeb/APICarrito/Login', {
+      const response = await fetch(`${API_BASE_URL}/Login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

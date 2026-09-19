@@ -3,6 +3,7 @@ import { ProductCatalog } from '../components/Catalogo/ProductCatalog';
 import { CategoryFilter } from '../components/Catalogo/CategoryFilter';
 import { BulkDownloadButton } from '../components/Catalogo/BulkDownloadButton';
 import { useLocation } from 'react-router-dom';
+import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 const Catalog = () => {
   const location = useLocation();
@@ -18,7 +19,7 @@ const Catalog = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(`https://systemweb.ddns.net/CarritoWeb/APICarrito/ListCatMXM_RGB?t=${Date.now()}`);
+        const response = await fetch(`${API_BASE_URL}/ListCatMXM_RGB?t=${Date.now()}`);
         if (!response.ok) {
           throw new Error('Error al obtener los datos');
         }
@@ -98,7 +99,7 @@ const Catalog = () => {
         }
         
         if (imageName && imageName.trim() !== '') {
-          const imageUrl = `https://systemweb.ddns.net/CarritoWeb/imgMXM/Catalogo/${imageName.trim()}`;
+          const imageUrl = `${IMAGE_BASE_URL}/imgMXM/Catalogo/${imageName.trim()}`;
           if (!productsByCategory[categoryKey].images.includes(imageUrl)) {
             productsByCategory[categoryKey].images.push(imageUrl);
           }

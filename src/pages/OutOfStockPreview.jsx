@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL, IMAGE_BASE_URL } from '../config/api';
 
 const OutOfStockPreview = () => {
   const [stockAlerts, setStockAlerts] = useState([]);
@@ -15,11 +16,7 @@ const OutOfStockPreview = () => {
         setLoading(true);
         
         // 1. Obtener lista de productos agotados
-        const response = await fetch(`https://systemweb.ddns.net/CarritoWeb/APICarrito/ListAgotados?t=${Date.now()}`, {
-          headers: {
-            'Origin': import.meta.env.VITE_API_ORIGIN
-          }
-        });
+        const response = await fetch(`${API_BASE_URL}/ListAgotados?t=${Date.now()}`);
         
         if (!response.ok) throw new Error('Error al obtener productos agotados');
         
@@ -51,11 +48,10 @@ const OutOfStockPreview = () => {
                 processedModels.add(modelo);
                 
                 const variacionesResponse = await fetch(
-                  `https://systemweb.ddns.net/CarritoWeb/APICarrito/ConsultaVariacionModelo?Modelo=${modelo}&t=${Date.now()}`,
+                  `${API_BASE_URL}/ConsultaVariacionModelo?Modelo=${modelo}&t=${Date.now()}`,
                   {
-                    headers: { 'Origin': import.meta.env.VITE_API_ORIGIN },
                     priority: 'low'
-                  }                   
+                  }
                 );
                 
                 if (!variacionesResponse.ok) return null;
@@ -94,14 +90,14 @@ const OutOfStockPreview = () => {
                       color: variacion.cvariacion || 'Sin color',
                       sku: variacion.Codigo || 'Sin SKU',
                       sizes: sizesWithLowStock,
-                      imageUrl: variacion.Imagen 
-                        ? `https://systemweb.ddns.net/CarritoWeb/${variacion.Imagen}`
+                      imageUrl: variacion.Imagen
+                        ? `${IMAGE_BASE_URL}/${variacion.Imagen}`
                         : null
                     });
 
                     // Usar la primera imagen disponible como imagen principal
                     if (!mainImageUrl && variacion.Imagen) {
-                      mainImageUrl = `https://systemweb.ddns.net/CarritoWeb/${variacion.Imagen}`;
+                      mainImageUrl = `${IMAGE_BASE_URL}/${variacion.Imagen}`;
                     }
                   }
                 });

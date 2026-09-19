@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { debounce } from "lodash";
 import ClientsTable from "../components/ClientsTable";
 import { FiSearch } from "react-icons/fi";
+import { API_BASE_URL } from "../config/api";
 
 const ClientSearch = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,11 +22,7 @@ const ClientSearch = () => {
     const fetchClients = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://systemweb.ddns.net/CarritoWeb/APICarrito/ListClientes', {
-          headers: {
-            'Origin': import.meta.env.VITE_API_ORIGIN
-          },
-        });
+        const response = await fetch(`${API_BASE_URL}/ListClientes`);
         if (!response.ok) {
           throw new Error("Error al obtener los clientes");
         }
@@ -85,11 +82,10 @@ const ClientSearch = () => {
     }
     
     try {
-      const response = await fetch('https://systemweb.ddns.net/CarritoWeb/APICarrito/CrearPedido', {
+      const response = await fetch(`${API_BASE_URL}/CrearPedido`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Origin': import.meta.env.VITE_API_ORIGIN
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           Usuario: user.username,

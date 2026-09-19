@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FiCheck, FiRotateCcw, FiArrowUp, FiArrowDown } from "react-icons/fi";
 import ImageModal from "./ImageModal";
+import { IMAGE_BASE_URL } from "../../config/api";
 
 const PartesTable = ({ 
   partes, 
@@ -22,7 +23,7 @@ const PartesTable = ({
     
     let processedImageName = imageName.replace(/\\/g, '/');
     
-    const baseUrl = 'https://systemweb.ddns.net/CarritoWeb/';
+    const baseUrl = `${IMAGE_BASE_URL}/`;
     const encodedPath = processedImageName.split('/').map(part => 
       encodeURIComponent(part)
     ).join('/');

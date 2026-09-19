@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Pagination from "./Pagination";
+import { API_BASE_URL } from "../../config/api";
 
 const PedidoList = () => {
   const [pedidos, setPedidos] = useState([]);
@@ -16,7 +17,7 @@ const PedidoList = () => {
   useEffect(() => {
     const fetchPedidos = async () => {
       try {
-        const response = await fetch(`https://systemweb.ddns.net/CarritoWeb/APICarrito/ConsultaPedidosConfirmados?t=${Date.now()}`);
+        const response = await fetch(`${API_BASE_URL}/ConsultaPedidosConfirmados?t=${Date.now()}`);
         if (!response.ok) throw new Error('Error al obtener los pedidos');
         
         const data = await response.json();

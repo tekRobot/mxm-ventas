@@ -4,6 +4,7 @@ import { useDebounce } from "use-debounce";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; // Asegúrate de importar useAuth
 import { cdnImg } from "../utils/imageCdn";
+import { API_BASE_URL, IMAGE_BASE_URL } from "../config/api";
 
 const ProductGrid = () => {
   const navigate = useNavigate();
@@ -32,11 +33,7 @@ const ProductGrid = () => {
       try {
         setOrderLoading(true);
         // Usar el username del usuario actual para consultar sus pedidos
-        const response = await fetch(`https://systemweb.ddns.net/CarritoWeb/APICarrito/ConsultaPedidos?Usuario=${user.username}&t=${Date.now()}`, {
-          headers: {
-            'Origin': import.meta.env.VITE_API_ORIGIN
-          },
-        });
+        const response = await fetch(`${API_BASE_URL}/ConsultaPedidos?Usuario=${user.username}&t=${Date.now()}`);
         
         if (!response.ok) {
           throw new Error("Error al obtener información del pedido");
@@ -82,11 +79,7 @@ const ProductGrid = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`https://systemweb.ddns.net/CarritoWeb/APICarrito/ListModelos?t=${Date.now()}`, {
-          headers: {
-            'Origin': import.meta.env.VITE_API_ORIGIN
-          },
-        });
+        const response = await fetch(`${API_BASE_URL}/ListModelos?t=${Date.now()}`);
         if (!response.ok) {
           throw new Error("Error al obtener los productos");
         }
@@ -273,7 +266,7 @@ const ProductGrid = () => {
                   <div className="bg-gray-100 h-48 flex items-center justify-center relative">
                     {firstProduct.Foto ? (
                       <img
-                        src={cdnImg(`https://systemweb.ddns.net/CarritoWeb/imgMXM/Catalogo/${firstProduct.Foto}`, 300)}
+                        src={cdnImg(`${IMAGE_BASE_URL}/imgMXM/Catalogo/${firstProduct.Foto}`, 300)}
                         alt={group.baseDescription}
                         className="h-full w-full object-contain"
                         loading="lazy"

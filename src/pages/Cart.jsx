@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import CartSection from "../components/CartSection";
 import { useAuth } from "../context/AuthContext";
 import ImageModal from "../components/ImageModal";
+import { API_BASE_URL, IMAGE_BASE_URL } from "../config/api";
 
 const Cart = () => {
   const location = useLocation();
@@ -36,7 +37,7 @@ const Cart = () => {
       const codigoVariacion = getCodigoVariacionFromArticulo(articulo);
       
       const response = await fetch(
-        `https://systemweb.ddns.net/CarritoWeb/APICarrito/ConsultaVariacionModelo?Modelo=${modelo}`
+        `${API_BASE_URL}/ConsultaVariacionModelo?Modelo=${modelo}`
       );
       
       if (!response.ok) {
@@ -51,7 +52,7 @@ const Cart = () => {
       if (variacion && variacion.Imagen) {
         const imagenPath = variacion.Imagen.replace(/\\/g, '/');
         console.log(`Imagen para artículo ${articulo}: ${imagenPath}`);
-        return `https://systemweb.ddns.net/CarritoWeb/${imagenPath}`;
+        return `${IMAGE_BASE_URL}/${imagenPath}`;
       }
       
       return null;
@@ -84,7 +85,7 @@ const Cart = () => {
       setAddingTicket(true);
       
       const response = await fetch(
-        "https://systemweb.ddns.net/CarritoWeb/APICarrito/agregaArtPed",
+        `${API_BASE_URL}/agregaArtPed`,
         {
           method: "POST",
           headers: {
@@ -109,7 +110,7 @@ const Cart = () => {
       
       // Recargar los datos del carrito para reflejar el cambio
       const cartResponse = await fetch(
-        `https://systemweb.ddns.net/CarritoWeb/APICarrito/Pedido/${pedidoId}?t=${Date.now()}`,
+        `${API_BASE_URL}/Pedido/${pedidoId}?t=${Date.now()}`,
         {
           cache: "no-store"
         }
@@ -142,7 +143,7 @@ const Cart = () => {
         
         if (pedidoId) {
           const response = await fetch(
-            `https://systemweb.ddns.net/CarritoWeb/APICarrito/Pedido/${pedidoId}?t=${Date.now()}`,
+            `${API_BASE_URL}/Pedido/${pedidoId}?t=${Date.now()}`,
             {
               cache: "no-store"
             }
@@ -250,7 +251,7 @@ const Cart = () => {
       }
 
       const response = await fetch(
-        `https://systemweb.ddns.net/CarritoWeb/APICarrito/EliminarPartPed`,
+        `${API_BASE_URL}/EliminarPartPed`,
         {
           method: 'POST',
           headers: {
@@ -290,7 +291,7 @@ const Cart = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://systemweb.ddns.net/CarritoWeb/APICarrito/VaciarPedido`,
+        `${API_BASE_URL}/VaciarPedido`,
         {
           method: 'POST',
           headers: {
@@ -332,7 +333,7 @@ const Cart = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://systemweb.ddns.net/CarritoWeb/APICarrito/CancelarPedido`,
+        `${API_BASE_URL}/CancelarPedido`,
         {
           method: 'POST',
           headers: {
@@ -375,7 +376,7 @@ const Cart = () => {
     try {
       setProcessingOrder(true);
       const response = await fetch(
-        `https://systemweb.ddns.net/CarritoWeb/APICarrito/ConfirmarPedido`,
+        `${API_BASE_URL}/ConfirmarPedido`,
         {
           method: 'POST',
           headers: {
@@ -419,7 +420,7 @@ const Cart = () => {
     try {
       setProcessingOrder(true);
       const response = await fetch(
-        `https://systemweb.ddns.net/CarritoWeb/APICarrito/ConfirmarPedido`,
+        `${API_BASE_URL}/ConfirmarPedido`,
         {
           method: 'POST',
           headers: {

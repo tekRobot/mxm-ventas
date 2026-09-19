@@ -1,4 +1,5 @@
 import { FiCheck } from 'react-icons/fi';
+import { IMAGE_BASE_URL } from '../../config/api';
 
 const ColorButton = ({ color, isSelected, onSelect }) => (
   <div>
@@ -10,7 +11,7 @@ const ColorButton = ({ color, isSelected, onSelect }) => (
     >
       <div className="w-20 h-20 rounded-full overflow-hidden">
         <img 
-          src={`https://systemweb.ddns.net/CarritoWeb/${color.Imagen}`}
+          src={`${IMAGE_BASE_URL}/${color.Imagen}`}
           alt={color.cvariacion}
           className="w-full h-full object-cover"
         />

@@ -1,8 +1,10 @@
+import { IMAGE_BASE_URL } from '../../config/api';
+
 const ProductImage = ({ imageUrl, altText }) => (
   <div className="h-[430px] bg-white flex items-center justify-center px-8 py-2 mt-3">
     {imageUrl ? (
-      <img 
-        src={`https://systemweb.ddns.net/CarritoWeb/${imageUrl}`}
+      <img
+        src={`${IMAGE_BASE_URL}/${imageUrl}`}
         alt={altText}
         className="max-h-full max-w-full object-contain"
         loading="lazy"
