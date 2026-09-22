@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import ImageModal from "../components/ImageModal";
 import { API_BASE_URL, IMAGE_BASE_URL } from "../config/api";
 import { sortPaqueteriaLast } from "../utils/sortCartItems";
+import { agregarTicketAPedido } from "../utils/ticket";
 
 const Cart = () => {
   const location = useLocation();
@@ -84,31 +85,9 @@ const Cart = () => {
 
     try {
       setAddingTicket(true);
-      
-      const response = await fetch(
-        `${API_BASE_URL}/agregaArtPed`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            Usuario: user.usuario || "",
-            articulo: "99PAQN700", 
-            cantidad: 1,
-            precio: 0,
-            venta: pedidoId,
-            desdeInventario: true
-          })
-        }
-      );
 
-      if (!response.ok) {
-        throw new Error("Error al agregar el ticket");
-      }
+      await agregarTicketAPedido(pedidoId, user.username);
 
-      const result = await response.json();
-      
       // Recargar los datos del carrito para reflejar el cambio
       const cartResponse = await fetch(
         `${API_BASE_URL}/Pedido/${pedidoId}?t=${Date.now()}`,
