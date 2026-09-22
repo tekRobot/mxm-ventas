@@ -1,10 +1,13 @@
 import { GoPencil } from "react-icons/go";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useCallback } from 'react';
+import { debounce } from "lodash";
+import { FiSearch } from "react-icons/fi";
 import { useAuth } from '../context/AuthContext';
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { FaArrowsAltV, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { API_BASE_URL } from "../config/api";
+import { filterPedidosByNombreCliente } from "../utils/filterPedidos";
 
 const Home = () => {
     const { user } = useAuth();
@@ -20,7 +23,11 @@ const Home = () => {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [allItems, setAllItems] = useState([]); // Almacenar todos los datos
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [searchLoading, setSearchLoading] = useState(false);
     const itemsPerPage = 50;
+    const isSearching = searchQuery.trim().length > 0;
 
     // Función para obtener todos los pedidos (sin detalles)
     const fetchAllPedidos = useCallback(async () => {
@@ -97,6 +104,37 @@ const Home = () => {
         
         return results;
     }, []);
+
+    // Buscar cliente por nombre entre TODOS los pedidos pendientes del vendedor
+    // (no solo los ya paginados), cargando sus detalles bajo demanda.
+    const performSearch = useCallback(async (query, pedidos) => {
+        const matches = filterPedidosByNombreCliente(pedidos, query);
+
+        if (!query.trim()) {
+            setSearchResults([]);
+            return;
+        }
+
+        try {
+            setSearchLoading(true);
+            const details = await fetchPedidosDetails(matches);
+            setSearchResults(details);
+        } catch (err) {
+            console.error('Error searching pedidos:', err);
+        } finally {
+            setSearchLoading(false);
+        }
+    }, [fetchPedidosDetails]);
+
+    const debouncedSearch = useCallback(
+        debounce((query, pedidos) => performSearch(query, pedidos), 300),
+        [performSearch]
+    );
+
+    useEffect(() => {
+        debouncedSearch(searchQuery, allItems);
+        return () => debouncedSearch.cancel();
+    }, [searchQuery, allItems, debouncedSearch]);
 
     // Cargar datos iniciales
     useEffect(() => {
@@ -179,10 +217,10 @@ const Home = () => {
     };
 
     // Función para ordenar los datos
-    const getSortedData = () => {
-        if (!sortConfig.key) return salesData;
+    const getSortedData = (data) => {
+        if (!sortConfig.key) return data;
 
-        const sortedData = [...salesData].sort((a, b) => {
+        const sortedData = [...data].sort((a, b) => {
             // Manejar diferentes tipos de datos
             let aValue = a[sortConfig.key];
             let bValue = b[sortConfig.key];
@@ -231,7 +269,8 @@ const Home = () => {
         return new Intl.DateTimeFormat('es-MX', options).format(dateObject);
     };
 
-    const sortedSalesData = getSortedData();
+    const displayItems = isSearching ? searchResults : salesData;
+    const sortedSalesData = getSortedData(displayItems);
 
     if (initialLoading) {
         return (
@@ -262,25 +301,50 @@ const Home = () => {
 
     return (
         <div className="mt-5 mx-2 sm:mx-0">
-            <div className="flex gap-2 mb-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
                 <Link to={'/nuevo'}>
                     <button className="border border-rose-500 text-pink-800 px-3 py-1.5 hover:cursor-pointer hover:bg-pink-50 transition-colors">
                         + Nueva Orden
                     </button>
                 </Link>
+
+                <div className="relative w-full sm:w-80">
+                    <input
+                        type="text"
+                        placeholder="Buscar cliente por nombre..."
+                        className="w-full py-2 pl-4 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
+                </div>
             </div>
-            
+
             <div className="mb-4 p-3 bg-blue-50 rounded">
                 <div className="flex justify-between items-center">
                     <div>
                         <p className="text-gray-600">
-                            Mostrando <span className="font-bold">{salesData.length}</span> de <span className="font-bold">{allItems.length}</span> ventas pendientes
+                            {isSearching ? (
+                                <>
+                                    {searchLoading ? 'Buscando...' : (
+                                        <>
+                                            <span className="font-bold">{searchResults.length}</span> resultado(s) para "{searchQuery.trim()}"
+                                        </>
+                                    )}
+                                </>
+                            ) : (
+                                <>
+                                    Mostrando <span className="font-bold">{salesData.length}</span> de <span className="font-bold">{allItems.length}</span> ventas pendientes
+                                </>
+                            )}
                         </p>
-                        <p className="text-sm text-gray-500">
-                            Página {page} - {Math.min(page * itemsPerPage, allItems.length)}/{allItems.length}
-                        </p>
+                        {!isSearching && (
+                            <p className="text-sm text-gray-500">
+                                Página {page} - {Math.min(page * itemsPerPage, allItems.length)}/{allItems.length}
+                            </p>
+                        )}
                     </div>
-                    {hasMore && (
+                    {!isSearching && hasMore && (
                         <button
                             onClick={loadMoreData}
                             disabled={loadingMore}
@@ -302,9 +366,13 @@ const Home = () => {
             </div>
             
             <div className="overflow-x-auto pt-3">
-                {salesData.length === 0 ? 
+                {sortedSalesData.length === 0 ?
                     <div className="flex justify-center items-center h-64">
-                        <p className="text-gray-500">No hay ventas pendientes.</p>
+                        <p className="text-gray-500">
+                            {isSearching
+                                ? (searchLoading ? 'Buscando...' : `No se encontró ningún cliente con pedido para "${searchQuery.trim()}".`)
+                                : 'No hay ventas pendientes.'}
+                        </p>
                     </div>
                 :
                     <>
@@ -378,7 +446,7 @@ const Home = () => {
                         </table>
                         
                         {/* Botón de cargar más al final */}
-                        {hasMore && (
+                        {!isSearching && hasMore && (
                             <div className="flex justify-center mt-6 mb-4">
                                 <button
                                     onClick={loadMoreData}
@@ -398,7 +466,7 @@ const Home = () => {
                         )}
                         
                         {/* Indicador de que no hay más datos */}
-                        {!hasMore && salesData.length > 0 && (
+                        {!isSearching && !hasMore && salesData.length > 0 && (
                             <div className="text-center mt-6 mb-4 p-4 bg-gray-50 rounded">
                                 <p className="text-gray-600">✅ Has llegado al final. Se mostraron todas las ventas pendientes.</p>
                             </div>
