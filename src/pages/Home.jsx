@@ -301,19 +301,17 @@ const Home = () => {
 
     return (
         <div className="mt-5 mx-2 sm:mx-0">
-            <div className="flex gap-2 mb-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
                 <Link to={'/nuevo'}>
                     <button className="border border-rose-500 text-pink-800 px-3 py-1.5 hover:cursor-pointer hover:bg-pink-50 transition-colors">
                         + Nueva Orden
                     </button>
                 </Link>
-            </div>
-            
-            <div className="mb-4">
-                <div className="relative max-w-md">
+
+                <div className="relative w-full sm:w-80">
                     <input
                         type="text"
-                        placeholder="Buscar cliente que tenga pedido..."
+                        placeholder="Buscar cliente por nombre..."
                         className="w-full py-2 pl-4 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
