@@ -2,12 +2,13 @@ import { GoPencil } from "react-icons/go";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useCallback } from 'react';
 import { debounce } from "lodash";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiPrinter } from "react-icons/fi";
 import { useAuth } from '../context/AuthContext';
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { FaArrowsAltV, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { API_BASE_URL } from "../config/api";
 import { filterPedidosByNombreCliente } from "../utils/filterPedidos";
+import { agregarTicketAPedido } from "../utils/ticket";
 
 const Home = () => {
     const { user } = useAuth();
@@ -26,6 +27,7 @@ const Home = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [searchLoading, setSearchLoading] = useState(false);
+    const [printingVenta, setPrintingVenta] = useState(null);
     const itemsPerPage = 50;
     const isSearching = searchQuery.trim().length > 0;
 
@@ -251,6 +253,23 @@ const Home = () => {
         return sortConfig.direction === 'asc' ? <FaArrowUp /> : <FaArrowDown />;
     };
 
+    // Agrega el artículo de ticket (99PAQN700) directamente desde la lista,
+    // sin tener que abrir el carrito del pedido.
+    const handlePrintTicket = async (venta) => {
+        if (printingVenta) return;
+
+        try {
+            setPrintingVenta(venta);
+            await agregarTicketAPedido(venta, user?.username);
+            alert(`Ticket agregado correctamente al pedido #${venta}`);
+        } catch (err) {
+            console.error('Error al agregar ticket:', err);
+            alert(`Error al agregar ticket: ${err.message}`);
+        } finally {
+            setPrintingVenta(null);
+        }
+    };
+
     const fechaActual = (dateInput) => {
         // Si la fecha viene en formato YYYY-MM-DD, agregar la zona horaria
         if (typeof dateInput === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
@@ -422,13 +441,25 @@ const Home = () => {
                                                     >
                                                         <MdOutlineShoppingCart className="text-blue-600 hover:text-blue-800 cursor-pointer" />
                                                     </Link>
-                                                    <Link 
-                                                        to={`/productos?pedido=${item.venta}`} 
+                                                    <Link
+                                                        to={`/productos?pedido=${item.venta}`}
                                                         className="text-gray-500 hover:text-rose-600 transition-colors duration-200"
                                                         title="Agregar productos"
                                                     >
                                                         <GoPencil className="text-rose-600 hover:text-rose-800 cursor-pointer" />
                                                     </Link>
+                                                    <button
+                                                        onClick={() => handlePrintTicket(item.venta)}
+                                                        disabled={printingVenta === item.venta}
+                                                        className="text-gray-500 hover:text-purple-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        title="Imprimir"
+                                                    >
+                                                        {printingVenta === item.venta ? (
+                                                            <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-purple-600"></div>
+                                                        ) : (
+                                                            <FiPrinter className="text-purple-600 hover:text-purple-800 cursor-pointer" />
+                                                        )}
+                                                    </button>
                                                 </div>
                                             </div>
                                         </td>
