@@ -448,10 +448,15 @@ const Home = () => {
                                                     >
                                                         <GoPencil className="text-rose-600 hover:text-rose-800 cursor-pointer" />
                                                     </Link>
-                                                    <button
-                                                        onClick={() => handlePrintTicket(item.venta)}
-                                                        disabled={printingVenta === item.venta}
-                                                        className="text-gray-500 hover:text-purple-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    <a
+                                                        href="#"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            handlePrintTicket(item.venta);
+                                                        }}
+                                                        className={`text-gray-500 hover:text-purple-600 transition-colors duration-200 ${
+                                                            printingVenta === item.venta ? 'opacity-50 pointer-events-none' : ''
+                                                        }`}
                                                         title="Imprimir"
                                                     >
                                                         {printingVenta === item.venta ? (
@@ -459,7 +464,7 @@ const Home = () => {
                                                         ) : (
                                                             <FiPrinter className="text-purple-600 hover:text-purple-800 cursor-pointer" />
                                                         )}
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </td>
