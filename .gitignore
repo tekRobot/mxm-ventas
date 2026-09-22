@@ -15,6 +15,9 @@ dist-ssr
 # Variables de entorno (valores reales por entorno; ver .env.example)
 .env
 
+# Documentos internos (no se versionan)
+docs/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
