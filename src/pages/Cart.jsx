@@ -4,6 +4,7 @@ import CartSection from "../components/CartSection";
 import { useAuth } from "../context/AuthContext";
 import ImageModal from "../components/ImageModal";
 import { API_BASE_URL, IMAGE_BASE_URL } from "../config/api";
+import { sortPaqueteriaLast } from "../utils/sortCartItems";
 
 const Cart = () => {
   const location = useLocation();
@@ -215,7 +216,10 @@ const Cart = () => {
       }
     });
     
-    return { itemsStock: stockItems, itemsNoStock: noStockItems };
+    return {
+      itemsStock: sortPaqueteriaLast(stockItems),
+      itemsNoStock: sortPaqueteriaLast(noStockItems)
+    };
   }, [cartData, imagesData]);
 
   // Calcular totales monetarios
