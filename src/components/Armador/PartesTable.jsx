@@ -101,18 +101,26 @@ const PartesTable = ({
               return (
                 <tr key={part.PartId} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {imageUrl && !hasImageError ? (
-                      <img 
-                        src={imageUrl} 
-                        alt={part.Descrip} 
-                        className="w-12 h-12 object-cover rounded cursor-pointer hover:opacity-75 transition-opacity"
-                        onClick={() => openImageModal(imageUrl)}
-                        onError={() => handleImageError(part.PartId)}
-                      />
-                    ) : (
-                      'No Disponible'
-                    )} 
-                  </td>                        
+                    <div className="flex flex-col items-start gap-1">
+                      {imageUrl && !hasImageError ? (
+                        <img
+                          src={imageUrl}
+                          alt={part.Descrip}
+                          className="w-12 h-12 object-cover rounded cursor-pointer hover:opacity-75 transition-opacity"
+                          onClick={() => openImageModal(imageUrl)}
+                          onError={() => handleImageError(part.PartId)}
+                        />
+                      ) : (
+                        'No Disponible'
+                      )}
+                      <div className="text-xs text-gray-500 leading-tight">
+                        <div>Clave Prod: {part.Articulo}</div>
+                        {part.ClaveProv?.trim() && (
+                          <div>Clave Prov: {part.ClaveProv.trim()}</div>
+                        )}
+                      </div>
+                    </div>
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
                     {part.Descrip}
                   </td>
