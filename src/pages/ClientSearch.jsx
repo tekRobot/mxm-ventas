@@ -5,6 +5,7 @@ import { debounce } from "lodash";
 import ClientsTable from "../components/ClientsTable";
 import { FiSearch } from "react-icons/fi";
 import { API_BASE_URL } from "../config/api";
+import { findVentaPendiente } from "../utils/pedidosPendientes";
 
 const ClientSearch = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,6 +15,7 @@ const ClientSearch = () => {
   const [error, setError] = useState(null);
   const [creatingOrder, setCreatingOrder] = useState(false);
   const [creatingQuote, setCreatingQuote] = useState(false);
+  const [clientesConPedidoPendiente, setClientesConPedidoPendiente] = useState([]);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -22,19 +24,29 @@ const ClientSearch = () => {
     const fetchClients = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_BASE_URL}/ListClientes`);
-        if (!response.ok) {
+
+        const [clientesResponse, pendientesResponse] = await Promise.all([
+          fetch(`${API_BASE_URL}/ListClientes`),
+          fetch(`${API_BASE_URL}/ConsultaClientesConPedidoPendiente?Usuario=${user.username}`)
+        ]);
+
+        if (!clientesResponse.ok) {
           throw new Error("Error al obtener los clientes");
         }
-        const data = await response.json();
-        
+        const data = await clientesResponse.json();
+
         // Filtrar clientes por el vendedor que inició sesión
-        const userClients = (data.ListClientes || []).filter(client => 
+        const userClients = (data.ListClientes || []).filter(client =>
           client.VENDEDOR === user?.username
         );
-        
+
         setClients(userClients);
         setFilteredClients(userClients);
+
+        // No bloquear la pantalla si esta consulta falla; solo se pierde el aviso de duplicado
+        if (pendientesResponse.ok) {
+          setClientesConPedidoPendiente(await pendientesResponse.json());
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -74,7 +86,15 @@ const ClientSearch = () => {
 
   const handleCreateOrder = async (clientId, isQuote = false) => {
     if (!user || creatingOrder || creatingQuote) return;
-    
+
+    const ventaPendiente = findVentaPendiente(clientesConPedidoPendiente, clientId);
+    if (ventaPendiente) {
+      const continuar = window.confirm(
+        `Ya tienes un pedido a nombre de este cliente, ¿deseas abrir uno nuevo? Ped. Num: ${ventaPendiente}`
+      );
+      if (!continuar) return;
+    }
+
     if (isQuote) {
       setCreatingQuote(true);
     } else {
