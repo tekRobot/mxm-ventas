@@ -22,5 +22,11 @@ export const agregarTicketAPedido = async (pedidoId, username) => {
     throw new Error('Error al agregar el ticket');
   }
 
-  return response.json();
+  const result = await response.json();
+
+  if (result.Mensaje !== 'Artículo agregado correctamente') {
+    throw new Error(result.Mensaje || 'Error al agregar el ticket');
+  }
+
+  return result;
 };
